@@ -31,14 +31,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> readAll() {
-        return itemRepository.readAll()
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<ItemDto> readAllByUserId(Long id) {
         List<Item> itemsList = itemRepository.readAllByUserId(id);
         List<ItemDto> itemDtoList = new ArrayList<>();

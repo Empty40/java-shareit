@@ -18,21 +18,18 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
-    //Получение всех вещей по id пользователя
     @GetMapping
     public List<ItemDto> getAll(@RequestHeader("X-Sharer-User-id") long userId) {
         log.info("Получен запрос GET /items");
         return itemService.readAllByUserId(userId);
     }
 
-    //Получение вещи по id
     @GetMapping("/{id}")
     public ItemDto get(@RequestHeader("X-Sharer-User-id") Long userId, @Valid @PathVariable Long id) {
         log.info("Получен запрос GET /items/{}", id);
         return itemService.getItemById(id);
     }
 
-    //Создание вещи
     @PostMapping
     public ItemDto create(@RequestHeader("X-Sharer-User-id") long userId, @Valid @RequestBody ItemDto itemDto) {
         log.info("Получен запрос POST /items");
@@ -40,7 +37,6 @@ public class ItemController {
         return itemService.create(item, userId);
     }
 
-    //Редактирование вещи
     @PatchMapping("/{id}")
     public ItemDto update(@RequestHeader("X-Sharer-User-id") long userId, @Valid @PathVariable Long id,
                           @RequestBody ItemDto itemDto) {
@@ -49,14 +45,12 @@ public class ItemController {
         return itemService.update(id, item, userId);
     }
 
-    //Удаление вещи
     @DeleteMapping("/{id}")
     public void delete(@RequestHeader("X-Sharer-User-id") long userId, @Valid @PathVariable Long id) {
         log.info("Получен запрос DELETE /items");
         itemService.delete(id, userId);
     }
 
-    //Поиск вещей
     @GetMapping("/search")
     private List<ItemDto> searching(@RequestParam String text) {
         return itemService.findItemsByText(text);

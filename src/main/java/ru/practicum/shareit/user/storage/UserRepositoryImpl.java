@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EmailException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;

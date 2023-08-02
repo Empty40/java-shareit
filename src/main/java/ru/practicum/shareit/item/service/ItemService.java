@@ -8,8 +8,6 @@ import java.util.List;
 public interface ItemService {
     ItemDto create(Item item, Long userId);
 
-    List<ItemDto> readAll();
-
     List<ItemDto> readAllByUserId(Long id);
 
     ItemDto update(Long id, Item item, Long userId);
