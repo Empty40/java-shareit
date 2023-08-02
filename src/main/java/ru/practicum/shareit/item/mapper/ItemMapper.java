@@ -6,7 +6,6 @@ import ru.practicum.shareit.request.mapper.RequestMapper;
 
 public class ItemMapper {
 
-    //Из item в ItemDto
     public static ItemDto toItemDto(Item item) {
         return ItemDto
                 .builder()
@@ -18,7 +17,6 @@ public class ItemMapper {
                 .build();
     }
 
-    //Из itemDto в item
     public static Item toItem(ItemDto itemDto) {
         return Item
                 .builder()
