@@ -16,10 +16,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, Item> items;
+
+    private final Map<Long, List<Item>> userItems;
     private static long itemId;
 
     public ItemRepositoryImpl() {
         items = new HashMap<>();
+        userItems = new HashMap<>();
     }
 
     private long generateId() {
@@ -30,6 +33,18 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Item create(Item item, User user) {
         item.setId(generateId());
         item.setOwner(user);
+
+        if (!userItems.containsKey(user.getId())) {
+            List<Item> itemToAdd = new ArrayList<>();
+            itemToAdd.add(item);
+            userItems.put(user.getId(), itemToAdd);
+        } else {
+            List<Item> itemList = userItems.get(user.getId());
+            if (!itemList.contains(item)) {
+                itemList.add(item);
+            }
+        }
+
         items.put(item.getId(), item);
         return items.get(item.getId());
     }
@@ -41,30 +56,12 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> readAllByUserId(Long id) {
-        List<Item> itemsById = new ArrayList<>();
-        for (Item item : readAll()) {
-            if (item.getOwner().getId().equals(id)) {
-                itemsById.add(item);
-            }
-        }
-        return itemsById;
+        return userItems.get(id);
     }
 
     @Override
     public Item update(Long id, Item item, User user) {
         checkItem(id);
-        if (item.getName() != null) {
-            items.get(id).setName(item.getName());
-        }
-        if (item.getDescription() != null) {
-            items.get(id).setDescription(item.getDescription());
-        }
-        if (item.getAvailable() != null) {
-            items.get(id).setAvailable(item.getAvailable());
-        }
-        if (user != null) {
-            items.get(id).setOwner(user);
-        }
         return items.get(id);
     }
 
@@ -82,9 +79,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> findItemsByText(String text) {
-        if (text.isBlank()) {
-            return new ArrayList<>();
-        }
         return readAll()
                 .stream()
                 .filter(item -> ((
@@ -96,8 +90,10 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     private void checkItem(Long itemId) {
         if (!items.containsKey(itemId)) {
-            log.warn("item с id = {}, не найден!", itemId);
-            throw new EntityNotFoundException("Предмет отсутствует в списке!");
+            if (items.get(itemId) == null) {
+                log.warn("item с id = {}, не найден!", itemId);
+                throw new EntityNotFoundException("Предмет отсутствует в списке!");
+            }
         }
     }
 }

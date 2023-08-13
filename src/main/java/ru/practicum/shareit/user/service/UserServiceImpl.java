@@ -27,32 +27,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(Long id, User user) {
-        if (userRepository.getUserById(id) != null) {
-            User updateUser = userRepository.update(id, user);
-            log.info("Пользователь с id '{}' обновлен", updateUser.getId());
-            return UserMapper.toUserDto(updateUser);
-        } else {
+        if (userRepository.getUserById(id) == null) {
             log.info("EntityNotFoundException (Такого пользователя нет в списке)");
             throw new EntityNotFoundException("Такого пользователя не существует!");
         }
+        User updateUser = userRepository.update(id, user);
+        log.info("Пользователь с id '{}' обновлен", updateUser.getId());
+        return UserMapper.toUserDto(updateUser);
     }
 
     @Override
     public UserDto get(Long userId) {
-        if (userRepository.getUserById(userId) != null) {
+        try {
             return UserMapper.toUserDto(userRepository.getUserById(userId));
-        } else {
+        } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(String.format("Пользователя с id=%d нет в списке", userId));
         }
     }
 
     @Override
     public void delete(Long userId) {
-        if (userRepository.getUserById(userId) != null) {
-            userRepository.delete(userId);
-        } else {
+        if (userRepository.getUserById(userId) == null) {
             throw new EntityNotFoundException(String.format("Пользователя с id=%d нет в списке", userId));
         }
+        userRepository.delete(userId);
     }
 
     @Override

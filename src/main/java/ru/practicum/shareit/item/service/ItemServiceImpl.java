@@ -47,6 +47,15 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("EntityNotFoundException (Предмет не может быть обновлен, т.к. он " +
                     "не принадлежит данному пользователь)");
         }
+        if (item.getName() != null) {
+            item1.setName(item.getName());
+        }
+        if (item.getDescription() != null) {
+            item1.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            item1.setAvailable(item.getAvailable());
+        }
         Item updateItem = itemRepository.update(item1.getId(), item, user);
         log.info("Предмет с id = '{}' обновлен", updateItem.getId());
         return ItemMapper.toItemDto(updateItem);
@@ -71,6 +80,9 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> findItemsByText(String text) {
         List<Item> itemsList = itemRepository.findItemsByText(text);
         List<ItemDto> itemDtoList = new ArrayList<>();
+        if (text.isBlank()) {
+            return new ArrayList<>();
+        }
         for (Item item : itemsList) {
             itemDtoList.add(ItemMapper.toItemDto(item));
         }

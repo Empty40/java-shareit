@@ -25,7 +25,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto get(@RequestHeader("X-Sharer-User-id") Long userId, @Valid @PathVariable Long id) {
+    public ItemDto get(@RequestHeader("X-Sharer-User-id") Long userId, @PathVariable Long id) {
         log.info("Получен запрос GET /items/{}", id);
         return itemService.getItemById(id);
     }
