@@ -40,16 +40,14 @@ public class UserServiceImpl implements UserService {
     public UserDto get(Long userId) {
         try {
             return UserMapper.toUserDto(userRepository.getUserById(userId));
-        } catch (EntityNotFoundException e) {
-            throw new EntityNotFoundException(String.format("Пользователя с id=%d нет в списке", userId));
+        } finally {
+
         }
     }
 
     @Override
     public void delete(Long userId) {
-        if (userRepository.getUserById(userId) == null) {
-            throw new EntityNotFoundException(String.format("Пользователя с id=%d нет в списке", userId));
-        }
+        userRepository.getUserById(userId);
         userRepository.delete(userId);
     }
 

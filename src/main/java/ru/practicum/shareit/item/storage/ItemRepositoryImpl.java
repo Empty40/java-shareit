@@ -34,16 +34,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         item.setId(generateId());
         item.setOwner(user);
 
-        if (!userItems.containsKey(user.getId())) {
-            List<Item> itemToAdd = new ArrayList<>();
-            itemToAdd.add(item);
-            userItems.put(user.getId(), itemToAdd);
-        } else {
-            List<Item> itemList = userItems.get(user.getId());
-            if (!itemList.contains(item)) {
-                itemList.add(item);
-            }
-        }
+        userItems.computeIfAbsent(user.getId(), k -> new ArrayList<>()).add(item);
 
         items.put(item.getId(), item);
         return items.get(item.getId());
