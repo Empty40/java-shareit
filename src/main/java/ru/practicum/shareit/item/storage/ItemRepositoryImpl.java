@@ -52,20 +52,17 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item update(Long id, Item item, User user) {
-        checkItem(id);
-        return items.get(id);
+        return items.get(checkItem(id));
     }
 
     @Override
     public Item getItemById(Long id) {
-        checkItem(id);
-        return items.get(id);
+        return items.get(checkItem(id));
     }
 
     @Override
     public void delete(Long id) {
-        checkItem(id);
-        items.remove(id);
+        items.remove(checkItem(id));
     }
 
     @Override
@@ -79,12 +76,12 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .collect(Collectors.toList());
     }
 
-    private void checkItem(Long itemId) {
-        if (!items.containsKey(itemId)) {
-            if (items.get(itemId) == null) {
-                log.warn("item с id = {}, не найден!", itemId);
-                throw new EntityNotFoundException("Предмет отсутствует в списке!");
-            }
+    private Long checkItem(Long itemId) {
+        Item item = items.get(itemId);
+        if (item == null) {
+            log.warn("item с id = {}, не найден!", itemId);
+            throw new EntityNotFoundException("Предмет отсутствует в списке!");
         }
+        return itemId;
     }
 }

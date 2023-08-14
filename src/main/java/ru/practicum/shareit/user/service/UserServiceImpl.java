@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
         try {
             return UserMapper.toUserDto(userRepository.getUserById(userId));
         } finally {
-
         }
     }
 
