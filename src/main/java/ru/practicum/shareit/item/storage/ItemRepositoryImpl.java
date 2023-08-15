@@ -52,6 +52,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item update(Long id, Item item, User user) {
+        items.put(id, item);
         return items.get(checkItem(id));
     }
 

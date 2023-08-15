@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             item1.setAvailable(item.getAvailable());
         }
-        Item updateItem = itemRepository.update(item1.getId(), item, user);
+        Item updateItem = itemRepository.update(item1.getId(), item1, user);
         log.info("Предмет с id = '{}' обновлен", updateItem.getId());
         return ItemMapper.toItemDto(updateItem);
     }
