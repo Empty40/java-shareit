@@ -92,7 +92,6 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> bookingList = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
         List<Comment> commentList = commentRepository.findByItemIn(itemList);
 
-
         List<ItemWithBookingAndCommentsDto> itemWithBookingAndCommentsDtoList = itemList.stream()
                 .map(itemMapper::itemWithBookingAndCommentsDto).collect(Collectors.toList());
 

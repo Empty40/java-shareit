@@ -5,8 +5,11 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.dto.BookingResponseForItemDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.dto.ItemResponseForBookingDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserResponseForBookingDto;
+import ru.practicum.shareit.user.model.User;
 
 @Component
 public class BookingMapper {
@@ -21,10 +24,13 @@ public class BookingMapper {
         );
     }
 
-    public Booking toBooking(BookingRequestDto bookingRequestDto) {
+    public Booking toBooking(BookingRequestDto bookingRequestDto, Item item, User user) {
         Booking booking = new Booking();
         booking.setStart(bookingRequestDto.getStart());
         booking.setEnd(bookingRequestDto.getEnd());
+        booking.setItem(item);
+        booking.setBooker(user);
+        booking.setStatus(BookingStatus.WAITING);
 
         return booking;
     }

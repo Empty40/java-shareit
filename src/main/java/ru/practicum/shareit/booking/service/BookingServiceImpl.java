@@ -47,10 +47,7 @@ public class BookingServiceImpl implements BookingService {
 
         validationDate(bookingRequestDto);
 
-        Booking booking = bookingMapper.toBooking(bookingRequestDto);
-        booking.setItem(item);
-        booking.setBooker(user);
-        booking.setStatus(BookingStatus.WAITING);
+        Booking booking = bookingMapper.toBooking(bookingRequestDto, item, user);
 
         return bookingMapper.toBookingDto(bookingRepository.save(booking));
     }
@@ -59,6 +56,9 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto approveBooking(long userId, long bookingId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Бронирование не найдено!"));
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NotFoundException("Пользователь не найден!"));
 
         if (booking.getItem().getOwner().getId() == userId) {
             if (approved) {
