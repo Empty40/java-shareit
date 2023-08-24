@@ -3,8 +3,8 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
-import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -45,9 +45,22 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Владелец не может забронировать свою вещь!");
         }
 
+        LocalDateTime start = bookingRequestDto.getStart();
+
+    LocalDateTime end = bookingRequestDto.getEnd();
+
+    List<Booking> timeList = bookingRepository.findByEndBetweenAndItemId(start, end, item.getId());
+
+            if (timeList.size() > 0) {
+        throw new AvailableException("Дата начала бронирования вещи раньше даты окончания другого бронирования");
+    }
+
         validationDate(bookingRequestDto);
 
-        Booking booking = bookingMapper.toBooking(bookingRequestDto, item, user);
+        Booking booking = bookingMapper.toBooking(bookingRequestDto);
+        booking.setItem(item);
+        booking.setBooker(user);
+        booking.setStatus(BookingStatus.WAITING);
 
         return bookingMapper.toBookingDto(bookingRepository.save(booking));
     }
@@ -56,9 +69,6 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponseDto approveBooking(long userId, long bookingId, boolean approved) {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(
                 () -> new NotFoundException("Бронирование не найдено!"));
-
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new NotFoundException("Пользователь не найден!"));
 
         if (booking.getItem().getOwner().getId() == userId) {
             if (approved) {
