@@ -23,6 +23,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,19 +112,32 @@ public class ItemServiceImpl implements ItemService {
         return itemWithBookingAndCommentsDtoList;
     }
 
-    @Override
+    /*@Override
     public List<ItemDto> searchItems(String text) {
         if (!text.isBlank()) {
-            if (text.contains("акк")) {
+            *//*if (text.contains("акк")) {
                 text = text.toLowerCase();
                 text = text.replaceFirst("а", "А");
             } else {
                 text = text.toLowerCase();
-            }
+            }*//*
             return itemRepository.searchItems(text).stream().map(itemMapper::toItemDto).collect(Collectors.toList());
         } else {
             return new ArrayList<>();
         }
+    }*/
+
+    public List<ItemDto> searchItems(String text) {
+        if (!text.isBlank()) {
+            List<Item> itemList = itemRepository
+                    .findByNameOrDescriptionContainingIgnoreCaseAndAvailableIsTrue(text, text);
+            List<ItemDto> itemDtoList = new ArrayList<>();
+            for (Item item : itemList) {
+                itemDtoList.add(itemMapper.toItemDto(item));
+            }
+            return itemDtoList;
+        }
+        return Collections.emptyList();
     }
 
     @Override

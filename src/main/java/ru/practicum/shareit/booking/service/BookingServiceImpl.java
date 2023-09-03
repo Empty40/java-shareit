@@ -45,17 +45,17 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Владелец не может забронировать свою вещь!");
         }
 
+        validationDate(bookingRequestDto);
+
         LocalDateTime start = bookingRequestDto.getStart();
 
-    LocalDateTime end = bookingRequestDto.getEnd();
+        LocalDateTime end = bookingRequestDto.getEnd();
 
-    List<Booking> timeList = bookingRepository.findByEndBetweenAndItemId(start, end, item.getId());
+        List<Booking> timeList = bookingRepository.findByEndBetweenAndItemId(start, end, item.getId());
 
-            if (timeList.size() > 0) {
-        throw new AvailableException("Дата начала бронирования вещи раньше даты окончания другого бронирования");
-    }
-
-        validationDate(bookingRequestDto);
+        if (timeList.size() > 0) {
+            throw new AvailableException("Дата начала бронирования вещи раньше даты окончания другого бронирования");
+        }
 
         Booking booking = bookingMapper.toBooking(bookingRequestDto);
         booking.setItem(item);
