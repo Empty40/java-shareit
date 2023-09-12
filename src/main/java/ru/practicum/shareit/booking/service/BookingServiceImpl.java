@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
 
         LocalDateTime end = bookingRequestDto.getEnd();
 
-        List<Booking> timeList = bookingRepository.findByEndBetweenAndItemId(start, end, item.getId());
+        List<Booking> timeList = bookingRepository.findByStartAfterAndEndBetweenAndItemId(start, start, end, item.getId());
 
         if (timeList.size() > 0) {
             throw new AvailableException("Дата начала бронирования вещи раньше даты окончания другого бронирования");
