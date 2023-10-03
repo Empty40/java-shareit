@@ -33,8 +33,4 @@ public class ItemRequest {
 
     @Transient
     private List<RequestAnswer> items;
-
-    public ItemRequest(String description) {
-        this.description = description;
-    }
 }
