@@ -1,6 +1,9 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -8,10 +11,7 @@ import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.AvailableException;
-import ru.practicum.shareit.exception.InvalidStateException;
-import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -28,6 +28,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
+    private final Sort sort = Sort.by(Sort.Direction.DESC, "end");
 
     @Override
     public BookingResponseDto createBooking(long userId, BookingRequestDto bookingRequestDto) {
@@ -103,13 +104,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findBookingsByBooker(long bookerId, String state) {
+    public List<BookingResponseDto> findBookingsByBooker(long bookerId, String state, int from, int size) {
         User user = userRepository.findById(bookerId).orElseThrow(
                 () -> new NotFoundException("Пользователь не найден!"));
 
+        checkPagingParametersAreCorrect(from, size);
+
+        Pageable page = PageRequest.of(from / size, size, sort);
+
         switch (state.toUpperCase()) {
             case "ALL":
-                return bookingRepository.findByBookerIdOrderByStartDesc(bookerId)
+                return bookingRepository.findAllByBookerIdOrderByStartDesc(bookerId, page)
                         .stream().map(bookingMapper::toBookingDto).collect(Collectors.toList());
             case "CURRENT":
                 return bookingRepository.findByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(bookerId,
@@ -133,13 +138,17 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> findBookingsByOwner(long ownerId, String state) {
+    public List<BookingResponseDto> findBookingsByOwner(long ownerId, String state, int from, int size) {
         User user = userRepository.findById(ownerId).orElseThrow(
                 () -> new NotFoundException("Пользователь не найден!"));
 
+        checkPagingParametersAreCorrect(from, size);
+
+        Pageable page = PageRequest.of(from / size, size, sort);
+
         switch (state.toUpperCase()) {
             case "ALL":
-                return bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId)
+                return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId, page)
                         .stream().map(bookingMapper::toBookingDto).collect(Collectors.toList());
             case "CURRENT":
                 return bookingRepository.findByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId,
@@ -168,6 +177,15 @@ public class BookingServiceImpl implements BookingService {
         if (start.isEqual(end) || end.isBefore(start)) {
             throw new ValidationException("Дата/время окончания бронирования не должны равняться " +
                     "или быть раньше даты/времени начала бронирования");
+        }
+    }
+
+    private void checkPagingParametersAreCorrect(Integer from, Integer size) {
+        if (size == null || size <= 0) {
+            throw new DataBaseException("Количество объектов, подлежащих выводу на одной странице, должно быть положительным.");
+        }
+        if (from < 0) {
+            throw new DataBaseException("Номер начальной страницы не может быть отрицательным.");
         }
     }
 }

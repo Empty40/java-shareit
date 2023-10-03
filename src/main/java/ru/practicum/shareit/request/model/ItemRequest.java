@@ -1,20 +1,40 @@
 package ru.practicum.shareit.request.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.user.model.User;
+import lombok.Setter;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
-@AllArgsConstructor
+@Entity
+@Table(name = "requests")
+@Getter
+@Setter
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ItemRequest {
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "request_id")
+    @EqualsAndHashCode.Include
+    private int id;
+
+    @Column(name = "requester_id", nullable = false)
+    private int requesterId;
+
+    @Column(name = "description", nullable = false)
     private String description;
-    private User requestor;
+
+    @Column(name = "created")
     private LocalDateTime created;
+
+    @Transient
+    private List<RequestAnswer> items;
+
+    public ItemRequest(String description) {
+        this.description = description;
+    }
 }
