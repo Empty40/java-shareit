@@ -31,4 +31,7 @@ public class Item {
     @ToString.Exclude
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Column(name = "request_id")
+    private int requestId;
 }
